@@ -55,29 +55,27 @@ class FluidCube:
 
 
 def set_bnd(b, x, n):
-    x[1:n-1, 0 ] = -x[1:n-1, 1 ] if b == 2 else x[1:n-1, 1 ]
-    x[1:n-1,n-1] = -x[1:n-1,n-2] if b == 2 else x[1:n-1,n-2]
+    x[1:-1, 0 ] = -x[1:-1, 1 ] if b == 2 else x[1:-1, 1 ]
+    x[1:-1, -1] = -x[1:-1, -2] if b == 2 else x[1:-1, -2]
 
-    x[ 0, 1:n-1] = -x[ 1, 1:n-1] if b == 1 else x[ 1, 1:n-1]
-    x[n-1,1:n-1] = -x[n-2,1:n-1] if b == 1 else x[n-2,1:n-1]
+    x[ 0, 1:-1] = -x[ 1, 1:-1] if b == 1 else x[ 1, 1:-1]
+    x[ -1,1:-1] = -x[-2, 1:-1] if b == 1 else x[-2, 1:-1]
 
-    x[ 0,  0 ] = 0.5 * (x[ 1,  0 ] + x[ 0,  1 ])
-    x[ 0, n-1] = 0.5 * (x[ 1, n-1] + x[ 0, n-2])
-    x[n-1, 0 ] = 0.5 * (x[n-2, 0 ] + x[n-1, 1 ])
-    x[n-1,n-1] = 0.5 * (x[n-2,n-1] + x[n-1,n-2])
+    x[0,  0 ] = 0.5 * (x[1,  0 ] + x[0,  1 ])
+    x[0,  -1] = 0.5 * (x[1,  -1] + x[0,  -2])
+    x[-1, 0 ] = 0.5 * (x[-2, 0 ] + x[-1, 1 ])
+    x[-1, -1] = 0.5 * (x[-2, -1] + x[-1, -2])
    
 
 
 def lin_solve(b, x, x0, a, c, iter, n):
     cRecip = 1.0 / c
     for k in range(iter):
-        for j in range(1, n-1):
-            for i in range(1, n - 1):
-                x[i, j] = (x0[i, j]
-                        + a*(    x[i+1, j  ]
-                                +x[i-1, j  ]
-                                +x[i  , j+1]
-                                +x[i  , j-1]
+        x[1:-1, 1:-1] = (x0[1:-1, 1:-1]
+                        + a*(    x[2:,   1:-1]
+                                +x[0:-2, 1:-1]
+                                +x[1:-1,  2: ]
+                                +x[1:-1, 0:-2]
                         )) * cRecip
         set_bnd(b, x, n)
 
@@ -88,25 +86,21 @@ def diffuse (b, x, x0, diff, dt, iter, n):
 
 
 def project(velocX, velocY, p, div, iter, n):
-    for j in range(1,n - 1):
-        for i in range(1,n - 1):
-            div[i, j] = -0.5 * (
-                    velocX[i+1, j  ]
-                   -velocX[i-1, j  ]
-                   +velocY[i  , j+1]
-                   -velocY[i  , j-1]
-                )/n
-            p[i, j] = 0
+    div[1:-1, 1:-1] = -0.5 * (
+            velocX[ 2:, 1:-1]
+           -velocX[0:-2,1:-1]
+           +velocY[1:-1, 2: ]
+           -velocY[1:-1,0:-2]
+            )/n
+    p[1:-1, 1:-1] = 0
     set_bnd(0, div, n); 
     set_bnd(0, p, n)
     lin_solve(0, p, div, 1, 6, iter, n)
  
-    for j in range(1,n - 1):
-        for i in range(1,n - 1):
-            velocX[i, j] -= 0.5 * (  p[i+1, j]
-                                            -p[i-1, j]) * n
-            velocY[i, j] -= 0.5 * (  p[i, j+1]
-                                            -p[i, j-1]) * n
+    velocX[1:-1, 1:-1] -= 0.5 * (  p[2:, 1:-1]
+                                    -p[0:-2, 1:-1]) * n
+    velocY[1:-1, 1:-1] -= 0.5 * (  p[1:-1, 2:]
+                                    -p[1:-1, 0:-2]) * n
     set_bnd(1, velocX, n)
     set_bnd(2, velocY, n)
 
@@ -147,3 +141,9 @@ def advect(b, d, d0,  velocX, velocY, dt, n):
                 
             d[i, j] = s0 * (t0 * d0[i0i, j0i] + t1 * d0[i0i, j1i]) +s1 * (t0 * d0[i1i, j0i] + t1 * d0[i1i, j1i])
     set_bnd(b, d, n)
+
+
+
+
+arr = np.array([2,3,4,5,6])
+print(arr[1:-1])
