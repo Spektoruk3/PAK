@@ -110,40 +110,34 @@ def advect(b, d, d0,  velocX, velocY, dt, n):
     dtx = dt * (n - 2)
     dty = dt * (n - 2)
     
-    Nfloat = n
+    tmp1 = dtx * velocX
+    tmp2 = dty * velocY
+    i = np.arange(0, n)
+    j = np.arange(0, n)
+    j, i = np.meshgrid(i, j)
+
+    x = i - tmp1
+    y = j - tmp2
+    x[x < .5] = .5
+    x[x > n + .5] = n + .5
+    y[y < .5] = .5
+    y[y > n + .5] = n + .5
+    i0 = np.floor(x).astype(np.int32)
+    i1 = i0 + 1
+    j0 = np.floor(y).astype(np.int32)
+    j1 = j0 + 1
+    i0 = np.clip(i0, 0 , n-1)
+    i1 = np.clip(i1, 0 , n-1)
+    j0 = np.clip(j0, 0 , n-1)
+    j1 = np.clip(j1, 0 , n-1)
     
-
-    for j, jfloat in range(1,n - 1): 
-        for i, ifloat in range(1,n - 1):
-            tmp1 = dtx * velocX[i, j]
-            tmp2 = dty * velocY[i, j]
-            x    = ifloat - tmp1 
-            y    = jfloat - tmp2
-               
-            if x < 0.5 : x = 0.5 
-            if x > Nfloat + 0.5 : x = Nfloat + 0.5 
-            i0 = floor(x)
-            i1 = i0 + 1.0
-            if(y < 0.5): y = 0.5 
-            if(y > Nfloat + 0.5): y = Nfloat + 0.5 
-            j0 = floor(y)
-            j1 = j0 + 1.0 
-               
-            s1 = x - i0
-            s0 = 1.0 - s1 
-            t1 = y - j0
-            t0 = 1.0 - t1
-             
-            i0i = i0
-            i1i = i1
-            j0i = j0
-            j1i = j1
-                
-            d[i, j] = s0 * (t0 * d0[i0i, j0i] + t1 * d0[i0i, j1i]) +s1 * (t0 * d0[i1i, j0i] + t1 * d0[i1i, j1i])
-    set_bnd(b, d, n)
-
-
-
-
-arr = np.array([2,3,4,5,6])
-print(arr[1:-1])
+    s1 = x - i0
+    s0 = 1 - s1
+    t1 = y - j0
+    t0 = 1 - t1
+    d = (s0 *  (t0 * d0[i0, j0]
+                            +t1 * d0[i0, j1])
+                    +s1 * ( t0 * d0[i1, j0]
+                            +t1 * d0[i1, j1]))
+    d = set_bnd(b, d, n)
+    return d
