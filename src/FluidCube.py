@@ -1,14 +1,17 @@
 import numpy as np
+import pygame
 from math import floor
 
+N = 128
+SCALE = 4
 
 class FluidCube:
-    def __init__(self, size, diffusion, viscosity, dt):
-        self.size = size
+    def __init__(self, diffusion, viscosity, dt):
+        self.size = N
         self.dt = dt
         self.diff = diffusion
         self.visc = viscosity
-        n = size
+        n = N
 
         self.s = np.zeros((n, n))
         self.density = np.zeros((n, n))
@@ -22,11 +25,43 @@ class FluidCube:
 
     def FluidCubeAddDensity(self, x, y, amount):
         self.density[x, y] += amount
+        self.density[x, y] = self.density[x, y] if self.density[x, y] < 255 else 255
+        
 
 
     def FluidCubeAddVelocity(self, x, y, amountX, amountY):
         self.Vx[x, y] += amountX
         self.Vy[x, y] += amountY
+
+    
+    def renderD(self):
+        s = pygame.display.get_surface()
+        for i in range(N):
+            for j in range(N):
+                if (self.density[i, j] > 0):
+                    x = i * SCALE
+                    y = j * SCALE
+                    d = self.density[i, j]
+                    d = 255 if d > 255 else d
+                    pygame.draw.rect(s, (d, d, d), (x, y, SCALE, SCALE))
+
+
+    def renderV(self):
+        s = pygame.display.get_surface()
+        for i in range(N):
+            for j in range(N):
+                if (self.density[i, j] > 0):
+                    x = i * SCALE
+                    y = j * SCALE
+                    vx = self.Vx[i, j]
+                    vy = self.Vy[i, j]
+                    if (abs(vx) >= 0.1 and abs(vy) > 0.1):
+                        pygame.draw.line(s, (255, 255, 255), (x, y), (x + vx * SCALE, y + vy * SCALE))
+
+
+    def fadeD(self):
+        self.density = np.where(self.density > 1.8, self.density - 0.2, 0)
+
 
     def FluidCubeStep(self):
         n          = self.size
@@ -139,5 +174,5 @@ def advect(b, d, d0,  velocX, velocY, dt, n):
                             +t1 * d0[i0, j1])
                     +s1 * ( t0 * d0[i1, j0]
                             +t1 * d0[i1, j1]))
-    d = set_bnd(b, d, n)
-    return d
+    set_bnd(b, d, n)
+
