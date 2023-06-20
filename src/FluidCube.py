@@ -6,7 +6,7 @@ N = 128
 SCALE = 4
 
 class FluidCube:
-    def __init__(self, diffusion, viscosity, dt):
+    def __init__(self, dt, diffusion, viscosity):
         self.size = N
         self.dt = dt
         self.diff = diffusion
@@ -60,33 +60,24 @@ class FluidCube:
 
 
     def fadeD(self):
-        self.density = np.where(self.density > 1.8, self.density - 0.2, 0)
+        self.density = np.where(self.density > 0.02, self.density - 0.02, 0)
 
 
     def FluidCubeStep(self):
-        n          = self.size
-        visc     = self.visc
-        diff     = self.diff
-        dt       = self.dt
-        Vx      = self.Vx
-        Vy      = self.Vy
-        Vx0     = self.Vx0
-        Vy0     = self.Vy0
-        s       = self.s
-        density = self.density
+        self.Vx0 = diffuse(1, self.Vx0, self.Vx, self.visc, self.dt, 4, N)
+        self.Vy0 = diffuse(2, self.Vy0, self.Vy, self.visc, self.dt, 4, N)
 
-        diffuse(1, Vx0, Vx, visc, dt, 4, n)
-        diffuse(2, Vy0, Vy, visc, dt, 4, n)
+        self.Vx0, self.Vy0, self.Vx, self.Vy = project(self.Vx0, self.Vy0, self.Vx, self.Vy, 4, N)
 
-        project(Vx0, Vy0, Vx, Vy, 4, n)
+        self.Vx = advect(1, self.Vx, self.Vx0, self.Vx0, self.Vy0, self.dt, N)
+        self.Vy = advect(2, self.Vy, self.Vy0, self.Vy0, self.Vx0, self.dt, N)
+
+        self.Vx, self.Vy, self.Vx0, self.Vy0 = project(self.Vx, self.Vy, self.Vx0, self.Vy0, 4, N)
+
+        self.s = diffuse(0, self.s, self.density, self.diff, self.dt, 4, N)
+        self.density = advect(0, self.density, self.s, self.Vx, self.Vy, self.dt, N)
+
         
-        advect(1, Vx, Vx0, Vx0, Vy0, dt, n)
-        advect(2, Vy, Vy0, Vx0, Vy0, dt, n)
-
-        project(Vx, Vy, Vx0, Vy0, 4, n)
-
-        diffuse(0, s, density, diff, dt, 4, n)
-        advect(0, density, s, Vx, Vy, dt, n)
 
 
 def set_bnd(b, x, n):
@@ -100,6 +91,7 @@ def set_bnd(b, x, n):
     x[0,  -1] = 0.5 * (x[1,  -1] + x[0,  -2])
     x[-1, 0 ] = 0.5 * (x[-2, 0 ] + x[-1, 1 ])
     x[-1, -1] = 0.5 * (x[-2, -1] + x[-1, -2])
+    return x
    
 
 
@@ -112,12 +104,14 @@ def lin_solve(b, x, x0, a, c, iter, n):
                                 +x[1:-1,  2: ]
                                 +x[1:-1, 0:-2]
                         )) * cRecip
-        set_bnd(b, x, n)
+        x = set_bnd(b, x, n)
+    return x
 
 
 def diffuse (b, x, x0, diff, dt, iter, n):
     a = dt * diff * (n - 2) * (n - 2)
-    lin_solve(b, x, x0, a, 1 + 6 * a, iter, n)
+    x = lin_solve(b, x, x0, a, 1 + 6 * a, iter, n)
+    return x
 
 
 def project(velocX, velocY, p, div, iter, n):
@@ -128,16 +122,17 @@ def project(velocX, velocY, p, div, iter, n):
            -velocY[1:-1,0:-2]
             )/n
     p[1:-1, 1:-1] = 0
-    set_bnd(0, div, n); 
-    set_bnd(0, p, n)
-    lin_solve(0, p, div, 1, 6, iter, n)
+    div = set_bnd(0, div, n); 
+    p = set_bnd(0, p, n)
+    p = lin_solve(0, p, div, 1, 6, iter, n)
  
     velocX[1:-1, 1:-1] -= 0.5 * (  p[2:, 1:-1]
                                     -p[0:-2, 1:-1]) * n
     velocY[1:-1, 1:-1] -= 0.5 * (  p[1:-1, 2:]
                                     -p[1:-1, 0:-2]) * n
-    set_bnd(1, velocX, n)
-    set_bnd(2, velocY, n)
+    velocX = set_bnd(1, velocX, n)
+    velocY = set_bnd(2, velocY, n)
+    return velocX, velocY, p, div
 
 
 def advect(b, d, d0,  velocX, velocY, dt, n):
@@ -174,5 +169,5 @@ def advect(b, d, d0,  velocX, velocY, dt, n):
                             +t1 * d0[i0, j1])
                     +s1 * ( t0 * d0[i1, j0]
                             +t1 * d0[i1, j1]))
-    set_bnd(b, d, n)
-
+    d = set_bnd(b, d, n)
+    return d
