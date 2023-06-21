@@ -2,11 +2,11 @@ import numpy as np
 import pygame
 from math import floor
 
-N = 128
-SCALE = 4
+N = 80
+SCALE = 10
 
 class FluidCube:
-    def __init__(self, dt, diffusion, viscosity):
+    def __init__(self, diffusion, viscosity, dt):
         self.size = N
         self.dt = dt
         self.diff = diffusion
