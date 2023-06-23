@@ -20,6 +20,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - name: Create Pull Request
+      uses: Spektoruk3/create-pull-request@v5
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v3
       with:
