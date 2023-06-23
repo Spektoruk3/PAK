@@ -1,6 +1,6 @@
 ## Симулятор несжимаемой жидкости
 
-![alt text](https://bagra.ru/logos/httprgb_saratovru.jpg)
+![alt text](https://github.com/Spektoruk3/PAK/blob/main/image/git.jpg)
 # RGB 
 <br>
 
