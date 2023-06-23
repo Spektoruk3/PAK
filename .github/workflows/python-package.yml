@@ -65,19 +65,11 @@ jobs:
         file: ./Dockerfile
         push: true
         tags: ${{ secrets.DOCKERHUB_USERNAME }}/fluidsimulator:latest
-        
-    - name: Checkout source
-      uses: actions/checkout@v2
-
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: "3.x"
     
     - name: Install dependencies
       run: |
         pip install setuptools wheel twine
-    - name: Build and publish
+    - name: Build and publish PyPi
       env:
         TWINE_USERNAME: __token__
         TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
