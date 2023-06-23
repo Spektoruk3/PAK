@@ -17,9 +17,7 @@ setup(
     long_description = long_description,
 
     url = 'https://github.com/Spektoruk3/PAK',
-
-    license="MIT",
     
-    packages = find_packages(),
+    packages = ['src'],
     install_requires = ['numpy', 'pygame'],
     )
