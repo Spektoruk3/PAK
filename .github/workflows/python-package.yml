@@ -92,6 +92,7 @@ jobs:
         release_name: Release v1.0.0 # Название релиза
         draft: false
         prerelease: false
+        overwrite: true
 
     - name: Get Asset name
       run: |
