@@ -12,14 +12,14 @@ def run():
     screen = pygame.display.set_mode((N*SCALE, N*SCALE))
     pygame.display.set_caption('FluidCubeGame')
     fluid = fc.FluidCube(1e-9 / 2, 1e-7, 1e-2)
-    surf = pygame.surfarray.make_surface(cv2.resize(fluid.density, (N*SCALE, N*SCALE)))
-
+    clock = pygame.time.Clock()
     lx, ly, x, y = 0, 0, 0, 0
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit()
         
+        clock.tick(100)
         screen.fill(0)
         fluid.FluidCubeStep()
         lx, ly = x, y 
@@ -29,8 +29,7 @@ def run():
         amtY = float(y - ly) 
         fluid.FluidCubeAddVelocity(x//SCALE, y//SCALE, amtX, amtY)
         fluid.fadeD()
-        pygame.surfarray.blit_array(surf, cv2.resize(fluid.density, (N*SCALE, N*SCALE)))
-        screen.blit(surf, (0, 0))
+        fluid.renderD()
         pygame.display.flip()
 
 def main():

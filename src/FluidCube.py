@@ -24,17 +24,20 @@ class FluidCube:
 
 
     def FluidCubeAddDensity(self, x, y, amount):
+        '''Adding a little dye density'''
         self.density[x, y] += amount
         self.density[x, y] = self.density[x, y] if self.density[x, y] < 255 else 255
         
 
 
     def FluidCubeAddVelocity(self, x, y, amountX, amountY):
+        '''Add some velocity'''
         self.Vx[x, y] += amountX
         self.Vy[x, y] += amountY
 
     
     def renderD(self):
+        '''Density rendering'''
         s = pygame.display.get_surface()
         for i in range(N):
             for j in range(N):
@@ -43,10 +46,11 @@ class FluidCube:
                     y = j * SCALE
                     d = self.density[i, j]
                     d = 255 if d > 255 else d
-                    pygame.draw.rect(s, (d, d, d), (x, y, SCALE, SCALE))
+                    pygame.draw.rect(s, (0, 0, d), (x, y, SCALE, SCALE))
 
 
     def renderV(self):
+        '''Velocity rendering'''
         s = pygame.display.get_surface()
         for i in range(N):
             for j in range(N):
@@ -60,6 +64,7 @@ class FluidCube:
 
 
     def fadeD(self):
+        '''Disappearance of the density or dissolution of the dye'''
         self.density = np.where(self.density > 0.02, self.density - 0.02, 0)
 
 
@@ -81,6 +86,13 @@ class FluidCube:
 
 
 def set_bnd(b, x, n):
+    '''This is short for "set bounds", and it's a way to keep
+       fluid from leaking out of your box. Walls are added by
+       treating the outer layer of cells as the wall. Basically,
+       every velocity in the layer next to this outer layer is
+       mirrored. So when you have some velocity towards the
+       wall in the next-to-outer layer, the wall gets a 
+       velocity that perfectly counters it.'''
     x[1:-1, 0 ] = -x[1:-1, 1 ] if b == 2 else x[1:-1, 1 ]
     x[1:-1, -1] = -x[1:-1, -2] if b == 2 else x[1:-1, -2]
 
@@ -96,6 +108,12 @@ def set_bnd(b, x, n):
 
 
 def lin_solve(b, x, x0, a, c, iter, n):
+    '''It's solving a linear differential equation of some sort.
+    This is done by running through the whole array and setting 
+    each cell to a combination of its neighbors. It does this 
+    several times; the more iterations it does, the more accurate 
+    the results, but the slower things run. After each iteration, 
+    it resets the boundaries so the calculations don't explode.'''
     cRecip = 1.0 / c
     for k in range(iter):
         x[1:-1, 1:-1] = (x0[1:-1, 1:-1]
@@ -109,12 +127,23 @@ def lin_solve(b, x, x0, a, c, iter, n):
 
 
 def diffuse (b, x, x0, diff, dt, iter, n):
+    '''We use diffusion both in the obvious case
+       of making the dye spread out, and also in 
+       the less obvious case of making the velocities
+       of the fluid spread out'''
     a = dt * diff * (n - 2) * (n - 2)
     x = lin_solve(b, x, x0, a, 1 + 6 * a, iter, n)
     return x
 
 
 def project(velocX, velocY, p, div, iter, n):
+    '''The amount of fluid in each box has to stay constant.
+       The amount of fluid going in has to be exactly equal
+       to the amount of fluid going out. The other operations
+       tend to screw things up so that you get some boxes
+       with a net outflow, and some with a net inflow. 
+       This operation runs through all the cells and fixes
+       them up so everything is in equilibrium.'''
     div[1:-1, 1:-1] = -0.5 * (
             velocX[ 2:, 1:-1]
            -velocX[0:-2,1:-1]
@@ -136,6 +165,17 @@ def project(velocX, velocY, p, div, iter, n):
 
 
 def advect(b, d, d0,  velocX, velocY, dt, n):
+    '''Every cell has a set of velocities, and these
+       velocities make things move. This is called
+       advection. As with diffusion, advection applies
+       both to the dye and to the velocities themselves.
+       This function is responsible for actually moving 
+       things around. To that end, it looks at each cell
+       in turn. In that cell, it grabs the velocity, 
+       follows that velocity back in time, and sees where
+       it lands. It then takes a weighted average of the
+       cells around the spot where it lands, then applies
+       that value to the current cell.'''
     
     dtx = dt * (n - 2)
     dty = dt * (n - 2)
