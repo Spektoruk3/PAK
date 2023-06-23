@@ -45,7 +45,7 @@ jobs:
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
     - name: Coverage report
-      uses: irongut/CodeCoverageSummary@v1.3.0
+      uses: Spektoruk3/PAK/CodeCoverageSummary@v1.3.0
       with:
         filename: coverage.xml
         badge: true
