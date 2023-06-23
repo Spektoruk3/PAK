@@ -3,7 +3,7 @@ import numpy as np
 import sys
 sys.path.insert(0, 'src/')
 
-from src import FluidCube as fc
+import FluidCube as fc
 
 class TestFluidCube(unittest.TestCase):
     def testFluid(self):
