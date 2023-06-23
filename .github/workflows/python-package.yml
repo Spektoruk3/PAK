@@ -78,14 +78,16 @@ jobs:
         twine upload dist/*
 
     - name: Create release
+      id: create_release
       uses: actions/create-release@v1
       env:
-        GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB  }}
+        GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
       with:
-        tag_name: ${{ github.run_number }}
-        release_name: Automatically created successful release
+        tag_name: "github.event.head_commit.id"
+        release_name: "FluidCubeGame"
+        overwrite: true
         body: |
-          Release windows version
+          Release ubuntu version
         draft: false
         prerelease: false
     - name: Upload Release Asset
@@ -93,9 +95,9 @@ jobs:
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
-      with:         
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: "dist/FluidCubeGame"
+      with:
+        upload_url: ${{steps.create_release.outputs.upload_url}}
+        asset_path: "dist/src"
         asset_name: "FluidCubeGame"
-        asset_content_type: application/octet-stream
+        asset_content_type: application/zip
         
