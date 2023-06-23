@@ -24,7 +24,7 @@ class FluidCube:
 
 
     def FluidCubeAddDensity(self, x, y, amount):
-        '''Adding a little dye density'''
+        '''Adding some dye density'''
         self.density[x, y] += amount
         self.density[x, y] = self.density[x, y] if self.density[x, y] < 255 else 255
         
