@@ -69,6 +69,8 @@ class FluidCube:
 
 
     def FluidCubeStep(self):
+        self.density = np.where(self.density < 255, self.density, 255)
+        
         self.Vx0 = diffuse(1, self.Vx0, self.Vx, self.visc, self.dt, 4, N)
         self.Vy0 = diffuse(2, self.Vy0, self.Vy, self.visc, self.dt, 4, N)
 
