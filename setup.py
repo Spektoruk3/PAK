@@ -18,6 +18,6 @@ setup(
 
     url = 'https://github.com/Spektoruk3/PAK',
 
-    packages = setuptools.find_packages(),
+    packages = find_packages(),
     install_requires = ['numpy', 'pygame'],
     )
