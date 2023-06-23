@@ -29,7 +29,7 @@
 >
 > Для самостоятельной сборки Docker образа можно использовать Dockerfile.
 > 
-> $ docker build -t fluidCube.
+> $ docker build . -t fluidSimulator
 
 ----------------------------------------------------------------
 
