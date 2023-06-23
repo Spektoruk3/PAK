@@ -97,7 +97,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
       with:
         upload_url: ${{steps.create_release.outputs.upload_url}}
-        asset_path: "dist/src"
+        asset_path: "dist/src/main.py"
         asset_name: "FluidCubeGame"
         asset_content_type: application/zip
         
