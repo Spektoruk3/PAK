@@ -2,7 +2,7 @@
 from setuptools import setup
 from setuptools import find_packages
 
-version = '0.1.9'
+version = '0.2.0'
 
 long_description = 'FluidCubeGame'
 
