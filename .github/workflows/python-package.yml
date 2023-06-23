@@ -64,4 +64,4 @@ jobs:
         context: .
         file: ./Dockerfile
         push: true
-        tags: ${{ secrets.DOCKERHUB_USERNAME }}/fluidSimulator:latest
+        tags: ${{ secrets.DOCKERHUB_USERNAME }}/fluidsimulator:latest
