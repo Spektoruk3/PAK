@@ -17,7 +17,7 @@
   3) cd ./env/Scripts
   4) ./activate.bat
   5) pip install FluidCubeGame
-  6) Затем зайди в этой же папке создать любой файл *.py с следющим содержанием:
+  6) Затем в этой же папке создать любой файл *.py с следющим содержанием:
      from src.FluidCubeGame.main import main
 
      main()
