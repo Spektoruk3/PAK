@@ -1,4 +1,4 @@
-from src.FluidCubeGame import FluidCube as fc
+from .FluidCubeGame import FluidCube as fc
 import pygame
 import sys
 
