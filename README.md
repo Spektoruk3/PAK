@@ -11,15 +11,14 @@
 <br>
 
 > Для установки приложения Вам необходимо создать любую папку
-> Запустить командную строку Windows
-> Ввести последовательно команды:
-  1) cd C:\Путь до папки
-  2) python -m venv env
-  3) cd C:\Путь до папки\env\Scripts
-  4) activate.bat
-  5) pip install fluidCube
-  6) Затем зайди в любой компилятор Python и ввести код:
-     from fluidCube import main
+> Открыть эту папку через любой компилятор, например, VS Code
+> Создать новый терминал и ввести последовательно команды:
+  1) python -m venv env
+  3) cd ./env/Scripts
+  4) ./activate.bat
+  5) pip install FluidCubeGame
+  6) Затем зайди в этой же папке создать любой файл *.py с следющим содержанием:
+     from src.FluidCubeGame.main import main
 
      main()
   7) Запустить программу
