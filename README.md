@@ -21,7 +21,7 @@
      from src.FluidCubeGame.main import main
 
      main()
-  7) Запустить программу
+  8) Запустить программу
 
 ### Docker-образ
 > Ссылка на скачивание - https://hub.docker.com/r/megasear/fluidcube
