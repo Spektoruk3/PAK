@@ -1,7 +1,6 @@
-import FluidCubeGame as fc
+import FluidCube as fc
 import pygame
 import sys
-import cv2
 
 N = fc.N
 SCALE = fc.SCALE
