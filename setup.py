@@ -2,7 +2,7 @@
 from setuptools import setup
 from setuptools import find_packages
 
-version = '1.0.3'
+version = '1.0.5'
 
 long_description = 'FluidCubeGame'
 
@@ -18,6 +18,6 @@ setup(
 
     url = 'https://github.com/Spektoruk3/PAK',
     
-    packages = ['src'],
+    packages = ['src/FluidCubeGame'],
     install_requires = ['numpy', 'pygame'],
     )
